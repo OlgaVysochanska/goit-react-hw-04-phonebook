@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid';
 
 import { ContactForm } from './components/ContactForm/ContactForm';
@@ -6,13 +6,25 @@ import { Filter } from './components/Filter/Filter';
 import { ContactList } from './components/ContactList/ContactList';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem('contacts')) ?? [];
-  });
+  const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
 
+  const contactsRef = useRef(contacts.lenght);
+
   useEffect(() => {
+    const savedContacts = JSON.parse(localStorage.getItem('contacts'));
+
+    if (savedContacts) {
+      setContacts([...savedContacts]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (contactsRef.current === contacts.length) {
+      return;
+    }
     localStorage.setItem('contacts', JSON.stringify(contacts));
+    contactsRef.current = contacts.length;
   }, [contacts]);
 
   const handleSubmit = data => {
